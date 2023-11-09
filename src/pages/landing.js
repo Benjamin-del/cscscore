@@ -15,7 +15,7 @@ export default function landing() {
                 <meta http-equiv="refresh" content="5;url=/scoreboard" />
             </Head>
             <div>
-            <h1>Cyber Patriot Scoreboard</h1>
+            <h1>Cyber Patriot Scoreboard Session Key</h1>
             <p>Created by: Benjamin-Del</p>
             <p>You will be redirected shortly.</p>
             <h3>Session Key</h3>
