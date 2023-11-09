@@ -33,7 +33,7 @@ export default function Home() {
         })
         console.log(items)
         localStorage.setItem("teams", JSON.stringify({t: items, color: document.getElementById("theme").value}))
-        window.location.href = "/landing"
+        window.location.href = "/scoreboard"
     }
     function load() {
         console.log("Lading Prev Session")
