@@ -1,0 +1,38 @@
+:root {
+    --primary: #04AA6D;
+}
+
+table {
+    font-family: Arial, Helvetica, sans-serif;
+    border-collapse: collapse;
+    width: 100%;
+    background: white
+  }
+
+  table td, table th {
+    border: 1px solid #ddd;
+    padding: 8px;
+  }
+
+    table tr:nth-child(even){background-color: #f2f2f2;}
+
+    table tr:hover {background-color: #ddd;}
+
+    table th {
+    text-align: left;
+    background-color: var(--primary);
+    color: white;
+  }
+    .bd {
+      padding-bottom: 30px;
+      /*backround: white*/
+    }
+.team {
+    padding-bottom: 10px;
+}
+
+code {
+    display: block;
+    width: 100%;
+    word-wrap: break-word;
+}
