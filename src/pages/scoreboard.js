@@ -9,20 +9,41 @@ export default function Scoreboard() {
     useEffect(() => {
         setIsClient(true)
     }, [])
-
-
-    if (typeof window !== 'undefined') {
-        useInterval(() => {
-            //console.timeEnd(id)
-            console.log("Loading Data...")
+    function fetchdata() {
+        console.log("Loading Data...")
+        
             fetch('/api/teams?b64=' + btoa(localStorage.getItem("teams")))
                 .then((res) => res.json())
                 .then((data) => {
+                    // Modify Data
+                    data.key = btoa(localStorage.getItem("teams"))
+                    data.status = "Last Updated at: " + data.date
+
+                    //Set Color
+                    data.color = localStorage.getItem("color") || "#AA273E"
                     setData(data)
                     setLoading(false)
                 })
-            console.log("Data Loaded (Auto)")
+                .catch(error => {
+                    console.log("Error.")
+                    console.log(error)
+                    setLoading(false)
+                    setData({ error: "Unexpected Error... Please try again later", status: "Error Loading Scoreboard"})
+                })
+            console.log("Data Loaded")
             console.log(data)
+    }
+
+    if (typeof window !== 'undefined') {
+        console.log("focus", document.hasFocus())
+
+        useEffect(() => {
+            fetchdata()
+        }, [])
+        useInterval(() => {
+            //console.timeEnd(id)
+            console.log("focus", document.hasFocus())
+            fetchdata()
         }, 30000);
 
     }
@@ -49,28 +70,28 @@ export default function Scoreboard() {
 
     if (isLoading) return (
         <div>
-            <h1>Cyber Patriot Scoreboard Session Key</h1>
-            <p>Created by: Benjamin-Del</p>
-            <p>The Scoreboard is Loading... Please Wait</p>
-            <h3>Session Key</h3>
-            <p>Your Session Key is:</p>
-            <code id="key">{isClient ? btoa(localStorage.getItem("teams")) : 'Error (Not a Key)'}</code>
-            <p>Copy this key and save it. You will need this key to access your scoreboard on a different device</p>
+            <h1>Cyber Patriot Scoreboard</h1>
+            <p>Scoreboard Loading...</p>
         </div>
     )
     if (data.error) return (<div><p>{data.error}</p><a href="/">Go Home</a></div>)
     if (!data) return <p>Error</p>
     function parsedata(data) {
+        console.log(data)
         const root = document.querySelector(':root');
-        root.style.setProperty("--primary", data.color);
+        root.style.setProperty("--primary", localStorage.getItem("color") || "#AA273E");
 
         try {
-        document.getElementById("udt").innerHTML = "Last Updated at: " + new Date().toLocaleTimeString()
+            //document.getElementById("udt").innerHTML = "Last Updated at: " + new Date().toLocaleTimeString()
         } catch (e) {
             console.log(e)
         }
         return data.teams.map((x) => {
-            return <div className="team" key={x.id} dangerouslySetInnerHTML={{ __html: x.table }}></div>
+            if (x.table) {
+                return <div className="team" key={x.id} dangerouslySetInnerHTML={{ __html: x.table }}></div>
+            } else {
+                return <div className="msg" key={x.id}><h3>{x.name}</h3><p>Team ID: {x.id}</p><p>Scoreboard Offline</p></div>
+            }
         })
     }
     var elem = document.documentElement;
@@ -85,9 +106,18 @@ export default function Scoreboard() {
             elem.msRequestFullscreen();
         }
 
-        document.getElementById("fullscreen").style.display = "none";
+        document.getElementById("custom").style.display = "none";
+    }
+    function updatecolor() {
+        console.log("Updated Color")
+        const root = document.querySelector(':root');
+        root.style.setProperty("--primary", document.getElementById("theme").value);
     }
 
+    function savetheme() {
+        console.log("Saved Theme")
+        localStorage.setItem("color", document.getElementById("theme").value)
+    }
     return (
         <div>
             <Head>
@@ -95,8 +125,17 @@ export default function Scoreboard() {
             </Head>
             <div>
                 <div>{parsedata(data)}</div>
-                <button id="fullscreen" onClick={() => openFullscreen()}>TV Mode</button>
-                <p id="udt">Waiting for update...</p>
+                <p id="udt">{data.status}</p>
+                <div id="custom">
+                    <h4>Customization</h4>
+                    <input id="theme" type='color' defaultValue={data.color} onChange={() => updatecolor()}></input>
+                    <br />
+                    <button onClick={() => savetheme()}>Save Theme</button>
+                    <br />
+                    <button id="fullscreen" onClick={() => openFullscreen()}>TV Mode</button>
+                    <p>Session Key</p>
+                    <code>{data.key || "NOT A KEY"}</code>
+                </div>
             </div>
         </div>
     )

@@ -36,3 +36,12 @@ code {
     width: 100%;
     word-wrap: break-word;
 }
+
+.msg {
+  background: var(--primary);
+  padding: 10px;
+  border-radius: 10px;
+  margin-bottom: 10px;
+  color: white;
+}
+@import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@300&display=swap');

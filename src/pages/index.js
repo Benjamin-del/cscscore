@@ -1,6 +1,30 @@
 import Head from 'next/head'
+import { useState, useEffect } from 'react'
 
 export default function Home() {
+    const [data, setData] = useState(null)
+    const [isLoading, setLoading] = useState(true)
+
+    useEffect(() => {
+        const teams = JSON.parse(localStorage.getItem("teams"))
+        
+        setData({
+            teams:(function () {
+                if (!teams) return []
+                return teams.t
+            })(),
+            color: localStorage.getItem("color") || "#AA273E"
+        })
+        setLoading(false)
+    }, [])
+    if (isLoading) return (
+        <div>
+            <h1>Cyber Patriot Scoreboard</h1>
+            <p>Scoreboard Loading...</p>
+        </div>
+    )
+    if (data.error) return (<div><p>{data.error}</p><a href="/">Go Home</a></div>)
+    if (!data) return <p>Error</p>
 
     function addteam() {
         const ele = document.getElementById("teams")
@@ -35,34 +59,6 @@ export default function Home() {
         localStorage.setItem("teams", JSON.stringify({t: items, color: document.getElementById("theme").value}))
         window.location.href = "/scoreboard"
     }
-    function load() {
-        console.log("Lading Prev Session")
-        const lc = localStorage.getItem("teams")
-        if (lc) {
-            const data = JSON.parse(lc)
-            console.log(data)
-            const ele = document.getElementById("teams")
-            ele.innerHTML = ""
-            data.t.forEach((x) => {
-                console.log(x)
-                const cld = document.createElement("div")
-                cld.setAttribute("team", x.id + "_" + x.name)
-
-                const name = document.createElement("h3")
-                const id = document.createElement("p")
-
-                name.innerHTML = "Team: " + x.name
-                id.innerHTML = "ID:" + x.id
-
-                cld.appendChild(name)
-                cld.appendChild(id)
-
-                ele.appendChild(cld)
-            })
-        } else {
-            alert("No previous session found.")
-        }
-    }
     function reset() {
         localStorage.removeItem("teams")
         document.getElementById("teams").innerHTML = ""
@@ -77,6 +73,7 @@ export default function Home() {
         localStorage.setItem("teams", atob(input))
         window.location.href = "/scoreboard"
     }
+    console.log(data)
     return (
         <div>
             <Head>
@@ -91,20 +88,26 @@ export default function Home() {
                     <p>Team ID</p>
                     <input id="id" placeholder='Team ID (16-XXXX)'></input>
                     <p>Scoreboard theme:</p>
-                    <input id="theme" type='color' /*value='#04AA6D'*/></input>
+                    <input id="theme" type='color' defaultValue={data.color}></input>
                     <div>
                         <button onClick={() => addteam()}>Add Team</button>
                         <button onClick={() => document.getElementById("teams").innerHTML = ""}>Clear Teams</button>
                         <button onClick={() => reset()}>Reset Storage (Danger)</button>
                         <button onClick={() => b64()}>B64 Session</button>
-                        <button onClick={() => load()}>Load Previous Session</button>
                         <button onClick={() => launch()}>Launch</button>
                     </div>
 
                 </div>
                 <p>NOTE: We can not verify IDs. Please ensure you have the correct IDs.</p>
                 <h2>Configured Teams</h2>
-                <div id="teams">
+                <div id="teams">{data.teams.map((x) => {
+                    return (
+                        <div className="team" key={x.id} team={x.id + "_" + x.name}>
+                            <h3>Team: {x.name}</h3>
+                            <p>ID: {x.id}</p>
+                        </div>
+                    )
+                })}
                 </div>
             </div>
         </div>

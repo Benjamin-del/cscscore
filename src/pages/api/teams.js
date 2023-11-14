@@ -28,14 +28,13 @@ export default async function App(req,res) {
         const dom = parse(text)
         const table = dom.querySelectorAll("table")
         const tb = table.toString().replace(/[\r\n]+/g, "").replace(teams[i].id, teams[i].name + " (" + teams[i].id + ")").replace(",","").replace("<br>"," ")
-        
         data.push({
             id: teams[i].id,
             name: teams[i].name,
-            table: tb      
+            table: tb || null,     
         })
     }
-    return new Response(JSON.stringify({teams: data, color: pm.color}), {
+    return new Response(JSON.stringify({teams: data, date: new Date().toLocaleTimeString()}), {
         headers: {
             "content-type": "application/json;charset=UTF-8",
         },
